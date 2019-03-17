@@ -1,0 +1,445 @@
+{
+	"info": {
+		"_postman_id": "415fac62-2a56-e802-0bfc-81d98fbc4353",
+		"name": "SAP ML Foundation",
+		"description": "Öncelikle Cloud Foundry'de P1941701105trial hesaptan bir ML foundation oluşturuldu ve bize FaaS olarak kullanabileceğimiz servisler sunuldu.\n\nSAP ML Foundation'da 4 farklı yol izlendi;\n\n\t1-\"API HUB\"deki API KEY ile var olan servisler FaaS olarak çağrıldı.\n\t2-\"BYOM\" ile yazılan kendi python kodumuz deploy edilip request atılmaya çalışıldı, kendi modelimiz vs. oluşturuldu.\n\t3-\"Retraining Model\" ile kod yazılmadan kendi datasetlerimiz ile modeli yeniden train ettik bunu kişiler üzerinden yaptık( Fatih Terim, Çağatay Ulusoy, Cansu Dere, Beren Saat..)\n\t4-Herhangi bir model train etmeden direkt olarak Cloud Foundry ML Foundationdaki Servisler FaaS olarak kullanıldı. ( Örn: Resimde kaç kişi var? Resimdeki nesneler neler? )\n\t\nNOT:\nBu Collection'da Authorization {{token}} değişkenine atandı, bunun için get crendatials ile token alınıp AWS_EU_Live-sapcp_ml_foundation'a global olarak atandı artık her request bu token ile çağrılacak. Tekrar tekrar yazılmasına gerek yok. ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Cloud Foundry Trial",
+			"item": [
+				{
+					"name": "BYOM",
+					"item": [
+						{
+							"name": "Add the model to the repository",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{token}}",
+										"disabled": true
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": "https://mlftrial-model-api.cfapps.eu10.hana.ondemand.com/api/v2/models/sap_community_example/versions"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Model to the repo",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "tenantName",
+										"value": "{{tenant_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "https://mlftrial-model-api.cfapps.eu10.hana.ondemand.com/api/v2/models/sap_community_example/versions"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Deployments",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "tenantName",
+										"value": "{{tenant_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"modelName\": \"sap_community_example\"}"
+								},
+								"url": "https://mlftrial-deployment-api.cfapps.eu10.hana.ondemand.com/api/v2/deployments"
+							},
+							"response": []
+						}
+					],
+					"description": "Bring  Your Own Model",
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Retraining Model",
+					"item": [
+						{
+							"name": "CF face detector",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "tenantName",
+										"value": "{{tenant_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "files",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": "https://mlftrial-face-detector.cfapps.eu10.hana.ondemand.com/api/v2alpha1/image/face-detection/"
+							},
+							"response": []
+						},
+						{
+							"name": "CF Image Classfication",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "tenantName",
+										"value": "{{tenant_id}}"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "files",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": "https://mlftrial-image-classifier.cfapps.eu10.hana.ondemand.com/api/v2/image/classification/"
+							},
+							"response": []
+						},
+						{
+							"name": "Human Detection",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/octet-stream"
+									},
+									{
+										"key": "tenantName",
+										"value": "{{tenant_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "multipart/form-data"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": "https://mlftrial-human-detection.cfapps.eu10.hana.ondemand.com/api/v2alpha1/image/human-detection/format:image",
+								"description": "Verilen resme göre ilgili resimleri getirecek.\n"
+							},
+							"response": []
+						},
+						{
+							"name": "DemoHumansDemo Versions 4",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "tenantName",
+										"value": "{{tenant_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "files",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": "https://mlftrial-image-classifier.cfapps.eu10.hana.ondemand.com/api/v2/image/classification/models/humans-demo/versions/4",
+								"description": "https://mlftrial-image-classifier.cfapps.eu10.hana.ondemand.com/api/v2/image/classification/models/humans-demo/versions/4"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Models ",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "tenantName",
+										"value": "{{tenant_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": "https://mlftrial-retrain-image-api.cfapps.eu10.hana.ondemand.com/api/v2/image/retraining/models"
+							},
+							"response": []
+						},
+						{
+							"name": "Test humans-demo Model V4",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "tenantName",
+										"value": "{{tenant_id}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "files",
+											"type": "file",
+											"src": ""
+										}
+									]
+								},
+								"url": "https://mlftrial-image-classifier.cfapps.eu10.hana.ondemand.com/api/v2/image/classification/models/humans-demo/versions/4",
+								"description": "https://mlftrial-image-classifier.cfapps.eu10.hana.ondemand.com/api/v2/image/classification/models/humans-demo/versions/4"
+							},
+							"response": []
+						}
+					],
+					"description": "Kendi datamızı train ettiğimiz  modelimiz. (Bring Your Own Model değil!)",
+					"_postman_isSubFolder": true
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": {
+					"token": "{{token}}"
+				}
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "35f9ad87-eb7c-4fb7-bb84-9f867becf8f1",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "49cb4dc6-0427-46a0-b268-930f3c241b02",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "API HUB",
+			"item": [
+				{
+					"name": "API HUB  Product Image Classification API",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "APIKey",
+								"value": "w0mGIVhrkMC3Y6mir3Y19mJ8TQra3oZg"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": "https://sandbox.api.sap.com/ml/prodimgclassifier/inference_sync"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "FIRST RUN: Get Credentials",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "33daafe8-2d90-475a-8b5f-193ed131a301",
+						"exec": [
+							"postman.setEnvironmentVariable(\"token\", JSON.parse(responseBody).access_token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic c2ItZWIxMGMwODAtOTU5Ny00NDQyLWI5OTQtZDM5YmI2YTQwNDExIWI4OTM0fGZvdW5kYXRpb24tc3RkLW1sZnRyaWFsIWIzNDEwOjB3c280b1BQZE9TRzZWc2U1QzNyOFo3bk0xZz0="
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://s0018892484trial.authentication.eu10.hana.ondemand.com/oauth/token?grant_type=client_credentials",
+					"protocol": "https",
+					"host": [
+						"s0018892484trial",
+						"authentication",
+						"eu10",
+						"hana",
+						"ondemand",
+						"com"
+					],
+					"path": [
+						"oauth",
+						"token"
+					],
+					"query": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": {
+			"token": "{{token}}"
+		}
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "62c91b48-65c0-40e3-818f-6e852793ce92",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "a1d2ef97-c78f-4a22-a0ba-1a3ef778f55e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
