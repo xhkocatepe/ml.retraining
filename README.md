@@ -1,7 +1,7 @@
-# ml.retraining
+# retraining
 SAP ML Foundation Retraining Model Custom Dataset
 
-# ml.postman
+# postman
 SAP ML Foundation Postman Configurations
 
 Öncelikle Cloud Foundry'de P1941701105trial hesaptan bir ML foundation oluşturuldu ve bize FaaS olarak kullanabileceğimiz servisler sunuldu.
